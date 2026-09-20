@@ -14,9 +14,7 @@ export default function InventoryLedger({ refreshKey = 0 }: { refreshKey?: numbe
   useEffect(() => {
     const fetchInventory = async () => {
       setIsLoading(true);
-      const data = await getInventoryAction(filterQuery, hideZeroStock);
-      setInventory(data);
-      setIsLoading(false);
+      getInventoryAction(filterQuery, hideZeroStock).then(data => { setInventory(data || []); setIsLoading(false); }).catch(e => { console.error(e); setIsLoading(false); });
     };
 
     const timer = setTimeout(() => {

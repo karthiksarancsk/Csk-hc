@@ -9,5 +9,5 @@ export async function voidInvoiceAction(invoiceId: number) {
     revalidatePath('/invoices');
     revalidatePath('/'); // Refresh stock view
   }
-  return result;
+  return JSON.parse(JSON.stringify(result));
 }

@@ -8,11 +8,12 @@ export async function createMedicineAction(data: MedicineDTO) {
   if (result.success) {
     revalidatePath('/'); // Revalidate where medicines are shown
   }
-  return result;
+  return JSON.parse(JSON.stringify(result));
 }
 
 export async function searchMedicinesAction(query: string) {
-  return await inventoryService.searchMedicines(query);
+  const res = await inventoryService.searchMedicines(query);
+  return JSON.parse(JSON.stringify(res));
 }
 
 export async function inwardBatchAction(data: BatchInwardDTO) {
@@ -21,9 +22,15 @@ export async function inwardBatchAction(data: BatchInwardDTO) {
     revalidatePath('/'); // Revalidate inventory table
     revalidatePath('/billing'); // Make sure POS sees the new stock
   }
-  return result;
+  return JSON.parse(JSON.stringify(result));
 }
 
 export async function getInventoryAction(query?: string, hideZeroStock?: boolean) {
-  return await inventoryService.listStockBatches({ query, hideZeroStock });
+  try {
+    const result = await inventoryService.listStockBatches({ query, hideZeroStock });
+    return JSON.parse(JSON.stringify(result));
+  } catch (e) {
+    console.error("GET INVENTORY ERROR:", e);
+    throw e;
+  }
 }

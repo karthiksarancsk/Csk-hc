@@ -4,7 +4,8 @@ import { billingService, CheckoutDTO } from '@/services/billing';
 import { revalidatePath } from 'next/cache';
 
 export async function searchBillingBatchesAction(query: string) {
-  return await billingService.getAvailableBatchesForBilling(query);
+  const result = await billingService.getAvailableBatchesForBilling(query);
+  return JSON.parse(JSON.stringify(result));
 }
 
 export async function createInvoiceAction(data: CheckoutDTO) {
@@ -13,13 +14,15 @@ export async function createInvoiceAction(data: CheckoutDTO) {
     revalidatePath('/'); // Refresh inventory ledger stock
     revalidatePath('/billing');
   }
-  return result;
+  return JSON.parse(JSON.stringify(result));
 }
 
 export async function getInvoiceDetailsAction(invoiceId: number) {
-  return await billingService.getInvoiceById(invoiceId);
+  const result = await billingService.getInvoiceById(invoiceId);
+  return JSON.parse(JSON.stringify(result));
 }
 
 export async function getRecentInvoicesAction() {
-  return await billingService.listRecentInvoices();
+  const result = await billingService.listRecentInvoices();
+  return JSON.parse(JSON.stringify(result));
 }

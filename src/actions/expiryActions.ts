@@ -63,8 +63,8 @@ export async function writeOffBatchAction(batchId: number, quantity: number, rea
 
     revalidatePath('/expiry');
     revalidatePath('/');
-    return { success: result };
+    return JSON.parse(JSON.stringify({ success: result }));
   } catch (error: any) {
-    return { success: false, error: error.message };
+    return JSON.parse(JSON.stringify({ success: false, error: error.message }));
   }
 }

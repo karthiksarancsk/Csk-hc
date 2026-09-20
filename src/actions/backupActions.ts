@@ -25,20 +25,21 @@ export async function backupDatabaseAction() {
     const fileBuffer = await fs.readFile(backupPath);
     const base64Data = fileBuffer.toString('base64');
 
-    return {
+    const res = {
       success: true,
       filename: `pharmacy_backup_${timestamp}.db`,
       data: base64Data
     };
+    return JSON.parse(JSON.stringify(res));
   } catch (error: any) {
-    return { success: false, error: error.message };
+    return JSON.parse(JSON.stringify({ success: false, error: error.message }));
   }
 }
 
 export async function restoreDatabaseAction(formData: FormData) {
   const file = formData.get('databaseFile') as File | null;
   if (!file) {
-    return { success: false, error: 'No database file uploaded.' };
+    return JSON.parse(JSON.stringify({ success: false, error: 'No database file uploaded.' }));
   }
 
   try {
@@ -62,13 +63,13 @@ export async function restoreDatabaseAction(formData: FormData) {
       if (missingTables.length > 0) {
          tempDb.close();
          await fs.unlink(tempPath);
-         return { success: false, error: `Invalid database file. Missing tables: ${missingTables.join(', ')}` };
+         return JSON.parse(JSON.stringify({ success: false, error: `Invalid database file. Missing tables: ${missingTables.join(', ')}` }));
       }
       tempDb.close();
     } catch (e: any) {
       if (tempDb) tempDb.close();
       await fs.unlink(tempPath);
-      return { success: false, error: 'Failed to open the uploaded file as a valid SQLite database.' };
+      return JSON.parse(JSON.stringify({ success: false, error: 'Failed to open the uploaded file as a valid SQLite database.' }));
     }
 
     // Since we validated it, replace the core db.
@@ -83,8 +84,8 @@ export async function restoreDatabaseAction(formData: FormData) {
     await fs.copyFile(tempPath, dbPath);
     await fs.unlink(tempPath);
 
-    return { success: true, message: 'Database restored successfully. Please restart the application to reconnect.' };
+    return JSON.parse(JSON.stringify({ success: true, message: 'Database restored successfully. Please restart the application to reconnect.' }));
   } catch (error: any) {
-    return { success: false, error: error.message };
+    return JSON.parse(JSON.stringify({ success: false, error: error.message }));
   }
 }
