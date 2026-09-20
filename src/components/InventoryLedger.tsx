@@ -9,21 +9,40 @@ export default function InventoryLedger({ refreshKey = 0 }: { refreshKey?: numbe
   const [filterQuery, setFilterQuery] = useState('');
   const [hideZeroStock, setHideZeroStock] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Initial load and debounced filter
   useEffect(() => {
+    let cancelled = false;
+
     const fetchInventory = async () => {
       setIsLoading(true);
-      const data = await getInventoryAction(filterQuery, hideZeroStock);
-      setInventory(data);
-      setIsLoading(false);
+      setError(null);
+
+      try {
+        const data = await getInventoryAction(filterQuery, hideZeroStock);
+
+        if (!cancelled) {
+          setInventory(data);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setInventory([]);
+          setError(err instanceof Error ? err.message : 'Unable to load inventory.');
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
     };
 
-    const timer = setTimeout(() => {
-      fetchInventory();
-    }, 300);
+    const timer = window.setTimeout(fetchInventory, 300);
 
-    return () => clearTimeout(timer);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
   }, [filterQuery, hideZeroStock, refreshKey]);
 
   const getStatusBadge = (item: InventoryItemView) => {
@@ -84,6 +103,10 @@ export default function InventoryLedger({ refreshKey = 0 }: { refreshKey?: numbe
             {isLoading ? (
               <tr>
                 <td colSpan={7} className="p-4 text-center text-gray-500">Loading inventory...</td>
+              </tr>
+            ) : error ? (
+              <tr>
+                <td colSpan={7} className="p-4 text-center text-red-600">{error}</td>
               </tr>
             ) : inventory.length === 0 ? (
               <tr>
