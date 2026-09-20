@@ -53,6 +53,26 @@ export default function SettingsPage() {
     }
   };
 
+  const handleRestore = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsRestoring(true);
+    setRestoreMessage(null);
+
+    try {
+      const res = await restoreDatabaseAction(new FormData(event.currentTarget));
+      if (res.success) {
+        setRestoreMessage({ type: 'success', text: res.message! });
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      } else {
+        setRestoreMessage({ type: 'error', text: res.error || 'Restore failed' });
+      }
+    } catch (err: any) {
+      setRestoreMessage({ type: 'error', text: err.message || 'Restore failed' });
+    } finally {
+      setIsRestoring(false);
+    }
+  };
+
   return (
     <div className="max-w-3xl mx-auto">
       <div className="sm:flex sm:items-center mb-8">
@@ -125,18 +145,7 @@ export default function SettingsPage() {
                 </div>
               )}
 
-              <form action={async (formData) => {
-                setIsRestoring(true);
-                setRestoreMessage(null);
-                const res = await restoreDatabaseAction(formData);
-                if (res.success) {
-                  setRestoreMessage({ type: 'success', text: res.message! });
-                  if (fileInputRef.current) fileInputRef.current.value = '';
-                } else {
-                  setRestoreMessage({ type: 'error', text: res.error || 'Restore failed' });
-                }
-                setIsRestoring(false);
-              }}>
+              <form onSubmit={handleRestore}>
                 <div className="flex items-center gap-4">
                   <input
                     type="file"

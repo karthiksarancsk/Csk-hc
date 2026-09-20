@@ -3,6 +3,8 @@ import './globals.css';
 import { expiryService } from '@/services/expiry';
 import { AlertCircle } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export default async function RootLayout({
   children,
 }: Readonly<{
