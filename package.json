@@ -1,0 +1,33 @@
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "db:setup": "npx tsx src/lib/db/setup.ts"
+  },
+  "dependencies": {
+    "autoprefixer": "^10.6.1",
+    "better-sqlite3": "^13.0.3",
+    "lucide-react": "^1.47.0",
+    "next": "16.3.5",
+    "postcss": "^8.5.28",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^22.20.4",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6.1.1",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.5",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5",
+    "vitest": "^5.0.1"
+  }
+}
