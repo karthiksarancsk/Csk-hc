@@ -22,8 +22,8 @@ export interface InventoryItemView {
   medicineId: number;
   medicineName: string;
   genericName: string | null;
-  batchNumber: string;
-  expiryDate: string;
+  batchNumber: string | null;
+  expiryDate: string | null;
   quantityAvailable: number;
   purchasePrice: number;
   sellingPrice: number;
@@ -133,18 +133,18 @@ export class DefaultInventoryService implements InventoryService {
     const db = getDb();
     let query = `
       SELECT
-        b.id,
-        b.medicine_id as medicineId,
+        COALESCE(b.id, -m.id) as id,
+        m.id as medicineId,
         m.name as medicineName,
         m.generic_name as genericName,
         b.batch_number as batchNumber,
         b.expiry_date as expiryDate,
-        b.quantity_available as quantityAvailable,
-        b.purchase_price as purchasePrice,
-        b.selling_price as sellingPrice,
+        COALESCE(b.quantity_available, 0) as quantityAvailable,
+        COALESCE(b.purchase_price, 0) as purchasePrice,
+        COALESCE(b.selling_price, 0) as sellingPrice,
         CAST(julianday(b.expiry_date) - julianday('now') AS INTEGER) as daysToExpiry
-      FROM inventory_batches b
-      JOIN medicines m ON b.medicine_id = m.id
+      FROM medicines m
+      LEFT JOIN inventory_batches b ON b.medicine_id = m.id
       WHERE 1=1
     `;
 
@@ -159,7 +159,7 @@ export class DefaultInventoryService implements InventoryService {
       params.searchQuery = `%${filter.query.trim()}%`;
     }
 
-    query += ' ORDER BY b.expiry_date ASC';
+    query += ' ORDER BY b.expiry_date ASC NULLS LAST, m.name ASC';
 
     const stmt = db.prepare(query);
     const rows = stmt.all(params) as any[];

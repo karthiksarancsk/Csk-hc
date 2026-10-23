@@ -26,6 +26,25 @@ describe('InventoryService', () => {
       expect(result.id).toBeGreaterThan(0);
     });
 
+    it('should appear in inventory before its first batch is inwarded', async () => {
+      await inventoryService.createMedicine({
+        name: 'Paracetamol',
+        genericName: 'Acetaminophen',
+        dosageForm: 'Tablet',
+        unitType: 'Strip'
+      });
+
+      const inventory = await inventoryService.listStockBatches();
+
+      expect(inventory).toHaveLength(1);
+      expect(inventory[0]).toMatchObject({
+        medicineName: 'Paracetamol',
+        genericName: 'Acetaminophen',
+        batchNumber: null,
+        quantityAvailable: 0
+      });
+    });
+
     it('should fail if trade name is blank', async () => {
       const result = await inventoryService.createMedicine({
         name: '   ',

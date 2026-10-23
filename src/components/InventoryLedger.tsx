@@ -46,6 +46,9 @@ export default function InventoryLedger({ refreshKey = 0 }: { refreshKey?: numbe
   }, [filterQuery, hideZeroStock, refreshKey]);
 
   const getStatusBadge = (item: InventoryItemView) => {
+    if (!item.batchNumber) {
+      return <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full font-medium">No batch</span>;
+    }
     if (item.isExpired) {
       return <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full font-medium">Expired</span>;
     }
@@ -117,8 +120,8 @@ export default function InventoryLedger({ refreshKey = 0 }: { refreshKey?: numbe
                 <tr key={item.id} className={`border-b hover:bg-gray-50 ${getRowClass(item)}`}>
                   <td className="p-3">{item.medicineName}</td>
                   <td className="p-3 text-gray-600 text-sm">{item.genericName || '-'}</td>
-                  <td className="p-3 font-mono text-sm">{item.batchNumber}</td>
-                  <td className="p-3">{item.expiryDate}</td>
+                  <td className="p-3 font-mono text-sm">{item.batchNumber || '-'}</td>
+                  <td className="p-3">{item.expiryDate || '-'}</td>
                   <td className="p-3 text-right font-medium">{item.quantityAvailable}</td>
                   <td className="p-3 text-right">{(item.sellingPrice / 100).toFixed(2)}</td>
                   <td className="p-3 text-center">{getStatusBadge(item)}</td>
